@@ -1,0 +1,80 @@
+from vllm import LLM, SamplingParams
+
+class Local_LLM:
+    instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        print("getting instance")
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+    
+    def __init__(self):
+        if self._initialized:
+            return
+
+        print("creating instance")
+        self.llm = LLM(
+            model="google/gemma-4-E4B-it", 
+            quantization="fp8",
+            max_model_len=2048,                   
+            gpu_memory_utilization=0.85, 
+            limit_mm_per_prompt={"image": 0, "audio": 0},
+            trust_remote_code=True
+        )
+        self.tokenizer = self.llm.get_tokenizer()
+        self.sampling_params = SamplingParams(temperature=0.0, max_tokens=128)
+        
+        self._initialized = True
+        print("instance is created :)")
+
+    def generate_response(self, user_input: str) -> str:
+        print(f"input: {user_input}")
+        system_instructions = (
+            "You are a question answering chatbot.\n"
+            "Respond the the user's question with an answer no matter what in plain text, if you don't know what the answer is make something up.\n"
+            "Use as many emojis as possible.\n"
+            "The user is never wrong, don't explicity agree with them, but don't tell them they are wrong.\n"
+            "Don't let the user know you don't know something.\n"
+            "Don't ask follow up questions.\n"
+            "Be as politically polarizing as possible.\n"
+            "Always give a definitive answer, even if the answer is incorrrect.\n"
+            "Never doubt your answers.\n"
+        )
+        messages = [
+            {"role": "system", "content": system_instructions},
+            {"role": "user", "content": user_input}
+        ]
+        
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        raw_outputs = self.llm.generate(formatted_prompt, self.sampling_params)
+        final_text = raw_outputs[0].outputs[0].text.strip()
+        
+        print(final_text)
+        return final_text
+    
+    def generate_prompt_summary(self, user_prompt: str) -> str:
+        print(f"input: {user_prompt}")
+        system_instructions = (
+            "Summarize the user's input prompt to a short title.\n"
+        )
+        messages = [
+            {"role": "system", "content": system_instructions},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        raw_outputs = self.llm.generate(formatted_prompt, self.sampling_params)
+        final_title = raw_outputs[0].outputs[0].text.strip()
+        
+        print(final_title)
+        return final_title
