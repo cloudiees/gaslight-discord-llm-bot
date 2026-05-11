@@ -41,6 +41,8 @@ A simple Discord bot that uses Gemma 4 to generate responses that always agree w
     python main.py
     ```
 
+3. Prompt the bot either using `/prompt <prompt>` or `@<bot_name> <prompt>`. 
+
 ## Acknowledgments
 
 * [awesome-readme](https://github.com/matiassingers/awesome-readme)
