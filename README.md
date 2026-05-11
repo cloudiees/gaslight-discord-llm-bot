@@ -42,7 +42,8 @@ A simple Discord bot that uses Gemma 4 to generate responses that always agree w
     ```
 
 3. Prompt the bot either using `/prompt <prompt>` or `@<bot_name> <prompt>`. 
-
+    ![Example usage of @ command](imgs/at_usage_example.png)
+    ![Example usage of / command](imgs/slash_usage_example.png)
 ## Acknowledgments
 
 * [awesome-readme](https://github.com/matiassingers/awesome-readme)
