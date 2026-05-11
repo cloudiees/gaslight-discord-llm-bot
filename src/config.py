@@ -1,3 +1,6 @@
+"""
+Grabs the discord bot key from the .env file
+"""
 import dotenv
 import os
 
